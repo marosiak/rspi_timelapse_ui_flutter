@@ -52,48 +52,53 @@ class _CpuStatsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Row(
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.memory, size: 35),
-            SizedBox(width: 8),
-            Text("CPU",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+            const Row(
+              children: [
+                Icon(Icons.memory, size: 35),
+                SizedBox(width: 8),
+                Text("CPU",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+              ],
+            ),
+            DataTable(
+              columns: const <DataColumn>[
+                DataColumn(
+                  label: Expanded(
+                    child: Text(
+                      'Free',
+                      style: TextStyle(fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                ),
+                DataColumn(
+                  label: Expanded(
+                    child: Text(
+                      'System',
+                      style: TextStyle(fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                ),
+                DataColumn(
+                  label: Expanded(
+                    child: Text(
+                      'User',
+                      style: TextStyle(fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                ),
+              ],
+              rows: <DataRow>[_dataRow],
+            )
           ],
         ),
-        DataTable(
-          columns: const <DataColumn>[
-            DataColumn(
-              label: Expanded(
-                child: Text(
-                  'Free',
-                  style: TextStyle(fontStyle: FontStyle.italic),
-                ),
-              ),
-            ),
-            DataColumn(
-              label: Expanded(
-                child: Text(
-                  'System',
-                  style: TextStyle(fontStyle: FontStyle.italic),
-                ),
-              ),
-            ),
-            DataColumn(
-              label: Expanded(
-                child: Text(
-                  'User',
-                  style: TextStyle(fontStyle: FontStyle.italic),
-                ),
-              ),
-            ),
-          ],
-          rows: <DataRow>[_dataRow],
-        )
-      ],
+      ),
     );
   }
 }
@@ -116,56 +121,61 @@ class _MemoryStatsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Row(
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.dns, size: 35),
-            SizedBox(width: 8),
-            Text("Memory",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+            const Row(
+              children: [
+                Icon(Icons.dns, size: 35),
+                SizedBox(width: 8),
+                Text("Ram",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+              ],
+            ),
+            DataTable(
+              columns: const <DataColumn>[
+                DataColumn(
+                  label: Expanded(
+                    child: Text(
+                      'Total',
+                      style: TextStyle(fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                ),
+                DataColumn(
+                  label: Expanded(
+                    child: Text(
+                      'Used',
+                      style: TextStyle(fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                ),
+                DataColumn(
+                  label: Expanded(
+                    child: Text(
+                      'Swap Total',
+                      style: TextStyle(fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                ),
+                DataColumn(
+                  label: Expanded(
+                    child: Text(
+                      'Swap Used',
+                      style: TextStyle(fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                ),
+              ],
+              rows: <DataRow>[_dataRow],
+            )
           ],
         ),
-        DataTable(
-          columns: const <DataColumn>[
-            DataColumn(
-              label: Expanded(
-                child: Text(
-                  'Total',
-                  style: TextStyle(fontStyle: FontStyle.italic),
-                ),
-              ),
-            ),
-            DataColumn(
-              label: Expanded(
-                child: Text(
-                  'Used',
-                  style: TextStyle(fontStyle: FontStyle.italic),
-                ),
-              ),
-            ),
-            DataColumn(
-              label: Expanded(
-                child: Text(
-                  'Swap Total',
-                  style: TextStyle(fontStyle: FontStyle.italic),
-                ),
-              ),
-            ),
-            DataColumn(
-              label: Expanded(
-                child: Text(
-                  'Swap Used',
-                  style: TextStyle(fontStyle: FontStyle.italic),
-                ),
-              ),
-            ),
-          ],
-          rows: <DataRow>[_dataRow],
-        )
-      ],
+      ),
     );
   }
 }
@@ -273,9 +283,18 @@ class _MyHomePageState extends State<MyHomePage> {
         padding: EdgeInsets.all(18.0),
         child: Column(
           children: [
-            _DateInfo(dateToDisplay: _lastUpdatedAt, helpText: "Data updated at:"),
-            SizedBox(height: 4),
-            _DateInfo(dateToDisplay: _lastPhotoTakenAt, helpText: "Last photo taken at:"),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    _DateInfo(dateToDisplay: _lastUpdatedAt, helpText: "Data updated at:"),
+                    SizedBox(height: 4),
+                    _DateInfo(dateToDisplay: _lastPhotoTakenAt, helpText: "Last photo taken at:"),
+                  ],
+                ),
+              ),
+            ),
             SizedBox(height: 8),
 
             Row(
