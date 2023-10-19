@@ -146,22 +146,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    double _width = MediaQuery.of(context).size.width;
+    double _height = MediaQuery.of(context).size.height;
 
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+    bool isHorizontal = (_width > 650);
 
-    bool isHorizontal = (width < 970);
-
-    List<Widget> getStatComponents(){
-      return [
-          Flexible(
-              flex: 1, child: CpuStatsWidget(cpuData: _cpuStats)),
-          const SizedBox(width: 18),
-          Flexible(
-              flex: 1,
-              child: MemoryStatsWidget(memData: _memoryStats)),
-        ];
-    }
     return Scaffold(
       appBar: null,
       body: _lastUpdatedAt != null
@@ -189,8 +178,24 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Row(
-                    children: getStatComponents(),
+                  SizedBox(
+                    width: _width,
+                    child: Wrap(
+                      alignment: WrapAlignment.spaceEvenly,
+                      direction: isHorizontal ? Axis.vertical : Axis.horizontal,
+                      // alignment: WrapAlignment.start,
+                      spacing: 18,
+                      children: [
+                        SizedBox(
+                            // height: 180,
+                            child: CpuStatsWidget(cpuData: _cpuStats)),
+                        // const SizedBox(width: 18),
+                        SizedBox(
+                            // height: 180,
+                            child: MemoryStatsWidget(memData: _memoryStats)
+                        ),
+                      ],
+                    ),
                   )
                 ],
               ))
