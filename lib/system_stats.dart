@@ -5,19 +5,19 @@ abstract class StatsWidget extends StatelessWidget {
   final Map<String, double> data;
   final String title;
   final IconData icon;
-  final List<String> columnNames;
+  final Map<String, String> columnMapping;
 
   StatsWidget({
     required this.data,
     required this.title,
     required this.icon,
-    required this.columnNames,
+    required this.columnMapping,
   });
 
   DataRow get dataRow {
     return DataRow(
-      cells: columnNames
-          .map((columnName) => DataCell(Text('${data[columnName]}')))
+      cells: columnMapping.keys
+          .map((key) => DataCell(Text('${data[key]}')))
           .toList(),
     );
   }
@@ -36,16 +36,15 @@ abstract class StatsWidget extends StatelessWidget {
                 Icon(icon, size: 35),
                 SizedBox(width: 8),
                 Text(title,
-                    style:
-                    TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
               ],
             ),
             DataTable(
-              columns: columnNames
-                  .map((columnName) => DataColumn(
+              columns: columnMapping.entries
+                  .map((entry) => DataColumn(
                 label: Expanded(
                   child: Text(
-                    columnName,
+                    entry.value,
                     style: TextStyle(fontStyle: FontStyle.italic),
                   ),
                 ),
@@ -66,7 +65,11 @@ class CpuStatsWidget extends StatsWidget {
     data: cpuData,
     title: 'CPU',
     icon: Icons.memory,
-    columnNames: ['Idle', 'System', 'User'],
+    columnMapping: {
+      'Idle': 'Idle',
+      'System': 'System',
+      'User': 'User'
+    },
   );
 }
 
@@ -76,6 +79,11 @@ class MemoryStatsWidget extends StatsWidget {
     data: memData,
     title: 'Ram',
     icon: Icons.dns,
-    columnNames: ['Total', 'Used', 'SwapTotal', 'SwapUsed'],
+    columnMapping: {
+      'Total': 'Total',
+      'Used': 'Used',
+      'SwapTotal': 'Total Swap',
+      'SwapUsed': 'Used Swap'
+    },
   );
 }
