@@ -271,33 +271,21 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: null,
       body: _lastUpdatedAt != null ? Padding(
         padding: EdgeInsets.all(18.0),
-        child: FittedBox(
-          fit: BoxFit.fill,
-          child: FittedBox(
-            fit: BoxFit.fill,
-            child: Column(
-              children: [
-                _DateInfo(dateToDisplay: _lastUpdatedAt, helpText: "Data updated at:"),
-                SizedBox(height: 4),
-                _DateInfo(dateToDisplay: _lastPhotoTakenAt, helpText: "Last photo taken at:"),
-                SizedBox(height: 8),
+        child: Column(
+          children: [
+            _DateInfo(dateToDisplay: _lastUpdatedAt, helpText: "Data updated at:"),
+            SizedBox(height: 4),
+            _DateInfo(dateToDisplay: _lastPhotoTakenAt, helpText: "Last photo taken at:"),
+            SizedBox(height: 8),
 
-                Row(
-                  children: [
-                    FittedBox(
-                      fit: BoxFit.fitWidth,
-                        child: _CpuStatsWidget(cpuData: _cpuStats)
-                    ),
-                    SizedBox(width: 48,),
-                    FittedBox(
-                      fit: BoxFit.fitWidth,
-                        child: _MemoryStatsWidget(memData: _memoryStats)
-                    ),
-                  ],
-                ),
+            Row(
+              children: [
+                _CpuStatsWidget(cpuData: _cpuStats),
+                SizedBox(width: 48,),
+                _MemoryStatsWidget(memData: _memoryStats),
               ],
             ),
-          ),
+          ],
         ),
       ) : Container(),
     );
