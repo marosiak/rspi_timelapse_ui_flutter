@@ -52,11 +52,15 @@ class _DateInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     return Row(
       children: [
         Text(helpText,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-        SizedBox(width: 8),
+            style:
+            width > 375
+                ? Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)
+                : Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
+        const SizedBox(width: 8),
         Text(
           "${formatDateTime(dateToDisplay)}",
         )

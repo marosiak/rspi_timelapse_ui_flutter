@@ -8,7 +8,7 @@ abstract class StatsWidget extends StatelessWidget {
   final Map<String, String> columnMapping;
   final String unit;  // Add this field
 
-  StatsWidget({super.key,
+  const StatsWidget({super.key,
     required this.data,
     required this.title,
     required this.icon,
@@ -16,12 +16,17 @@ abstract class StatsWidget extends StatelessWidget {
     required this.unit,  // Add this to the constructor
   });
 
-  DataRow get dataRow {
+  bool isPhone(BuildContext context) {
+    return MediaQuery.of(context).size.width > 595;
+  }
+
+  DataRow getDataRow(BuildContext context) {
     return DataRow(
       cells: columnMapping.keys
           .map((key) => DataCell(
           Text(
-              '${data[key]} $unit',
+            '${data[key]} $unit',
+            style: isPhone(context) ? Theme.of(context).textTheme.bodyLarge : Theme.of(context).textTheme.bodySmall,
           )
       ))  // Use unit here
           .toList(),
@@ -30,7 +35,6 @@ abstract class StatsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -42,23 +46,27 @@ abstract class StatsWidget extends StatelessWidget {
               children: [
                 Icon(icon, size: 35),
                 const SizedBox(width: 8),
-                Text(title,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: width > 595 ? 30 : 20)),
+                Text(
+                  title,
+                  style: isPhone(context)
+                      ? Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)
+                      : Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)
+                )
               ],
             ),
             DataTable(
-              columnSpacing: width > 595 ? 25 : 10,
+              columnSpacing: isPhone(context) ? 25 : 10,
               columns: columnMapping.entries
                   .map((entry) => DataColumn(
                 label: Expanded(
                   child: Text(
                     entry.value,
-                    style: width > 595 ? Theme.of(context).textTheme.bodyLarge : Theme.of(context).textTheme.bodySmall,
+                    style: isPhone(context) ? Theme.of(context).textTheme.bodyLarge : Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
               ))
                   .toList(),
-              rows: <DataRow>[dataRow],
+              rows: [getDataRow(context)],
             ),
           ],
         ),
