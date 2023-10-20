@@ -19,13 +19,18 @@ abstract class StatsWidget extends StatelessWidget {
   DataRow get dataRow {
     return DataRow(
       cells: columnMapping.keys
-          .map((key) => DataCell(Text('${data[key]} $unit')))  // Use unit here
+          .map((key) => DataCell(
+          Text(
+              '${data[key]} $unit',
+          )
+      ))  // Use unit here
           .toList(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -36,18 +41,19 @@ abstract class StatsWidget extends StatelessWidget {
             Row(
               children: [
                 Icon(icon, size: 35),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(title,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: width > 595 ? 30 : 20)),
               ],
             ),
             DataTable(
+              columnSpacing: width > 595 ? 25 : 10,
               columns: columnMapping.entries
                   .map((entry) => DataColumn(
                 label: Expanded(
                   child: Text(
                     entry.value,
-                    style: TextStyle(fontStyle: FontStyle.italic),
+                    style: width > 595 ? Theme.of(context).textTheme.bodyLarge : Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
               ))
