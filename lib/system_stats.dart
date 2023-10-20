@@ -17,7 +17,7 @@ abstract class StatsWidget extends StatelessWidget {
   });
 
   bool isPhone(BuildContext context) {
-    return MediaQuery.of(context).size.width > 595;
+    return MediaQuery.of(context).size.width < 595;
   }
 
   DataRow getDataRow(BuildContext context) {
@@ -26,7 +26,7 @@ abstract class StatsWidget extends StatelessWidget {
           .map((key) => DataCell(
           Text(
             '${data[key]} $unit',
-            style: isPhone(context) ? Theme.of(context).textTheme.bodyLarge : Theme.of(context).textTheme.bodySmall,
+            style: isPhone(context) ? Theme.of(context).textTheme.bodySmall : Theme.of(context).textTheme.bodyLarge,
           )
       ))  // Use unit here
           .toList(),
@@ -44,24 +44,28 @@ abstract class StatsWidget extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(icon, size: 35),
+                Icon(icon, size:
+                isPhone(context) ? 32 : 38
+                ),
                 const SizedBox(width: 8),
                 Text(
                   title,
                   style: isPhone(context)
-                      ? Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)
-                      : Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)
+                      ? Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)
+                      : Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)
                 )
               ],
             ),
             DataTable(
-              columnSpacing: isPhone(context) ? 25 : 10,
+              columnSpacing: isPhone(context) ? 10 :  25,
               columns: columnMapping.entries
                   .map((entry) => DataColumn(
                 label: Expanded(
                   child: Text(
                     entry.value,
-                    style: isPhone(context) ? Theme.of(context).textTheme.bodyLarge : Theme.of(context).textTheme.bodySmall,
+                    style: isPhone(context)
+                        ? Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold)
+                        : Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
                   ),
                 ),
               ))
