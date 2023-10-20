@@ -94,10 +94,10 @@ class CpuStatsWidget extends StatsWidget {
   );
 }
 
-class MemoryStatsWidget extends StatsWidget {
-  MemoryStatsWidget({required Map<String, double> memData})
+class RamStatsWidget extends StatsWidget {
+  RamStatsWidget({super.key, required Map<String, double> ramData})
       : super(
-    data: memData,
+    data: ramData,
     title: 'Ram',
     icon: Icons.dns,
     columnMapping: {
@@ -107,5 +107,19 @@ class MemoryStatsWidget extends StatsWidget {
       'SwapUsed': 'Used Swap',
     },
     unit: 'MB',  // Add unit here
+  );
+}
+
+class MemoryStatsWidget extends StatsWidget {
+  MemoryStatsWidget({super.key, required Map<String, double> memData})
+      : super(
+    data: memData,
+    title: 'Memory',
+    icon: Icons.sd_storage,
+    columnMapping: {
+      'Total': 'Total',
+      'Free': 'Free',
+    },
+    unit: 'GB',  // Add unit here
   );
 }

@@ -56,10 +56,15 @@ class _DateInfo extends StatelessWidget {
     return Row(
       children: [
         Text(helpText,
-            style:
-            width > 375
-                ? Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)
-                : Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
+            style: width > 375
+                ? Theme.of(context)
+                    .textTheme
+                    .bodyLarge
+                    ?.copyWith(fontWeight: FontWeight.bold)
+                : Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(width: 8),
         Text(
           "${formatDateTime(dateToDisplay)}",
@@ -71,13 +76,19 @@ class _DateInfo extends StatelessWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final channel = HtmlWebSocketChannel.connect('ws://raspberrypi.local/ws');
+  // final channel = HtmlWebSocketChannel.connect('ws://localhost/ws');
   late Timer _timer;
   Map<String, double> _cpuStats = {'User': 0, 'System': 0, 'Idle': 0};
-  Map<String, double> _memoryStats = {
+  Map<String, double> _ramStats = {
     'Total': 0,
     'Used': 0,
     'SwapTotal': 0,
     'SwapUsed': 0
+  };
+
+  Map <String, double> _memoryStats = {
+    'Total': 3,
+    'Free': 1,
   };
   DateTime? _lastUpdatedAt;
   DateTime? _lastPhotoTakenAt;
@@ -113,25 +124,34 @@ class _MyHomePageState extends State<MyHomePage> {
           shouldUpdateDate = true;
         }
 
-        if (data['stats']['memory'] != null) {
-          _memoryStats = {
+        if (data['stats']['ram'] != null) {
+          _ramStats = {
             'Total': double.parse(
-                (data['stats']['memory']['Total'] / (1024 * 1024))
+                (data['stats']['ram']['Total'] / (1024 * 1024))
                     .toStringAsFixed(2)),
-            'Used': double.parse(
-                (data['stats']['memory']['Used'] / (1024 * 1024))
-                    .toStringAsFixed(2)),
-            'SwapTotal': double.parse(((data['stats']['memory']['SwapTotal'] ??
-                        data['stats']['memory']['VirtualTotal']) /
+            'Used': double.parse((data['stats']['ram']['Used'] / (1024 * 1024))
+                .toStringAsFixed(2)),
+            'SwapTotal': double.parse(((data['stats']['ram']['SwapTotal'] ??
+                        data['stats']['ram']['VirtualTotal']) /
                     (1024 * 1024))
                 .toStringAsFixed(2)),
-            'SwapUsed': double.parse(((data['stats']['memory']['SwapUsed'] ??
-                        (data['stats']['memory']['VirtualTotal'] -
-                            data['stats']['memory']['VirtualFree'])) /
+            'SwapUsed': double.parse(((data['stats']['ram']['SwapUsed'] ??
+                        (data['stats']['ram']['VirtualTotal'] -
+                            data['stats']['ram']['VirtualFree'])) /
                     (1024 * 1024))
                 .toStringAsFixed(2)),
           };
           shouldUpdateDate = true;
+        }
+
+        if (data['stats']['memory'] != null) {
+          _memoryStats = {
+            'Total': double.parse(
+            (data['stats']['memory']['Total'] / (1024 * 1024 * 1024))
+                .toStringAsFixed(2)),
+            'Free': double.parse((data['stats']['memory']['Free'] / (1024 * 1024 * 1024))
+                .toStringAsFixed(2)),
+          };
         }
 
         if (shouldUpdateDate) {
@@ -157,11 +177,13 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             children: [
               _DateInfo(
-                  dateToDisplay: _lastUpdatedAt, helpText: "Data updated at:"),
+                  dateToDisplay: _lastUpdatedAt, helpText: "Data updated at:"
+              ),
               SizedBox(height: 4),
               _DateInfo(
                   dateToDisplay: _lastPhotoTakenAt,
-                  helpText: "Last photo taken at:"),
+                  helpText: "Last photo taken at:"
+              ),
             ],
           ),
         ),
@@ -173,11 +195,10 @@ class _MyHomePageState extends State<MyHomePage> {
     if (isHorizontal) {
       return Row(
         children: [
-          Expanded(
-              child: CpuStatsWidget(cpuData: _cpuStats)),
+          Expanded(child: CpuStatsWidget(cpuData: _cpuStats)),
           // const SizedBox(width: 18),
-          Expanded(
-              child: MemoryStatsWidget(memData: _memoryStats)),
+          Expanded(child: RamStatsWidget(ramData: _ramStats)),
+          Expanded(child: MemoryStatsWidget(memData: _memoryStats)),
         ],
       );
     } else {
@@ -189,7 +210,11 @@ class _MyHomePageState extends State<MyHomePage> {
           // const SizedBox(width: 18),
           SizedBox(
               // height: 180,
-              child: MemoryStatsWidget(memData: _memoryStats)),
+              child: RamStatsWidget(ramData: _ramStats)),
+          SizedBox(
+              // height: 180,
+              child: MemoryStatsWidget(memData: _memoryStats)
+          ),
         ],
       );
     }
