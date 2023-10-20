@@ -195,10 +195,18 @@ class _MyHomePageState extends State<MyHomePage> {
     if (isHorizontal) {
       return Row(
         children: [
-          Expanded(child: CpuStatsWidget(cpuData: _cpuStats)),
-          // const SizedBox(width: 18),
-          Expanded(child: RamStatsWidget(ramData: _ramStats)),
-          Expanded(child: MemoryStatsWidget(memData: _memoryStats)),
+          Expanded(
+            flex: 3,
+              child: CpuStatsWidget(cpuData: _cpuStats)
+          ),
+          Expanded(
+              flex: 5,
+              child: RamStatsWidget(ramData: _ramStats)
+          ),
+          Expanded(
+              flex: 2,
+              child: MemoryStatsWidget(memData: _memoryStats)
+          ),
         ],
       );
     } else {
