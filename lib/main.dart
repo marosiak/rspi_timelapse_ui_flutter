@@ -198,9 +198,8 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
 
-    bool isHorizontal = (width > height);
+    bool isTablet = (width > 980);
 
     return Scaffold(
       appBar: null,
@@ -211,7 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   _getStatusBar(),
                   const SizedBox(height: 8),
-                  _getWidgets(isHorizontal)
+                  _getWidgets(isTablet),
                 ],
               ))
           : Container(),
