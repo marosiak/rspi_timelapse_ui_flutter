@@ -144,59 +144,70 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
+  Widget _getStatusBar() {
+    return ConstrainedBox(
+      constraints: BoxConstraints(minWidth: 200),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              _DateInfo(
+                  dateToDisplay: _lastUpdatedAt, helpText: "Data updated at:"),
+              SizedBox(height: 4),
+              _DateInfo(
+                  dateToDisplay: _lastPhotoTakenAt,
+                  helpText: "Last photo taken at:"),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _getWidgets(bool isHorizontal) {
+    if (isHorizontal) {
+      return Row(
+        children: [
+          Expanded(
+              child: CpuStatsWidget(cpuData: _cpuStats)),
+          // const SizedBox(width: 18),
+          Expanded(
+              child: MemoryStatsWidget(memData: _memoryStats)),
+        ],
+      );
+    } else {
+      return Column(
+        children: [
+          SizedBox(
+              // height: 180,
+              child: CpuStatsWidget(cpuData: _cpuStats)),
+          // const SizedBox(width: 18),
+          SizedBox(
+              // height: 180,
+              child: MemoryStatsWidget(memData: _memoryStats)),
+        ],
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width;
-    double _height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
 
-    bool isHorizontal = (_width > 650);
+    bool isHorizontal = (width > height);
 
     return Scaffold(
       appBar: null,
       body: _lastUpdatedAt != null
           ? Padding(
-              padding: EdgeInsets.all(18.0),
+              padding: const EdgeInsets.all(18.0),
               child: Column(
                 children: [
-                  ConstrainedBox(
-                    constraints: BoxConstraints(minWidth: 200),
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            _DateInfo(
-                                dateToDisplay: _lastUpdatedAt,
-                                helpText: "Data updated at:"),
-                            SizedBox(height: 4),
-                            _DateInfo(
-                                dateToDisplay: _lastPhotoTakenAt,
-                                helpText: "Last photo taken at:"),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+                  _getStatusBar(),
                   const SizedBox(height: 8),
-                  SizedBox(
-                    width: _width,
-                    child: Wrap(
-                      alignment: WrapAlignment.spaceEvenly,
-                      direction: isHorizontal ? Axis.vertical : Axis.horizontal,
-                      // alignment: WrapAlignment.start,
-                      spacing: 18,
-                      children: [
-                        SizedBox(
-                            // height: 180,
-                            child: CpuStatsWidget(cpuData: _cpuStats)),
-                        // const SizedBox(width: 18),
-                        SizedBox(
-                            // height: 180,
-                            child: MemoryStatsWidget(memData: _memoryStats)
-                        ),
-                      ],
-                    ),
-                  )
+                  _getWidgets(isHorizontal)
                 ],
               ))
           : Container(),

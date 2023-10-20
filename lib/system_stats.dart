@@ -6,18 +6,20 @@ abstract class StatsWidget extends StatelessWidget {
   final String title;
   final IconData icon;
   final Map<String, String> columnMapping;
+  final String unit;  // Add this field
 
-  StatsWidget({
+  StatsWidget({super.key,
     required this.data,
     required this.title,
     required this.icon,
     required this.columnMapping,
+    required this.unit,  // Add this to the constructor
   });
 
   DataRow get dataRow {
     return DataRow(
       cells: columnMapping.keys
-          .map((key) => DataCell(Text('${data[key]}')))
+          .map((key) => DataCell(Text('${data[key]} $unit')))  // Use unit here
           .toList(),
     );
   }
@@ -68,8 +70,9 @@ class CpuStatsWidget extends StatsWidget {
     columnMapping: {
       'Idle': 'Idle',
       'System': 'System',
-      'User': 'User'
+      'User': 'User',
     },
+    unit: '%',  // Add unit here
   );
 }
 
@@ -83,7 +86,8 @@ class MemoryStatsWidget extends StatsWidget {
       'Total': 'Total',
       'Used': 'Used',
       'SwapTotal': 'Total Swap',
-      'SwapUsed': 'Used Swap'
+      'SwapUsed': 'Used Swap',
     },
+    unit: 'MB',  // Add unit here
   );
 }
