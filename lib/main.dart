@@ -36,11 +36,12 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _DateInfo extends StatelessWidget {
+class InfoText extends StatelessWidget {
   DateTime? dateToDisplay;
+  String? stringToDisplay;
   String helpText;
 
-  _DateInfo({this.dateToDisplay, required this.helpText});
+  InfoText({this.dateToDisplay, this.stringToDisplay, required this.helpText});
 
   String? formatDateTime(DateTime? dateTime) {
     if (dateTime == null) {
@@ -66,9 +67,7 @@ class _DateInfo extends StatelessWidget {
                     .bodyMedium
                     ?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(width: 8),
-        Text(
-          "${formatDateTime(dateToDisplay)}",
-        )
+        Text(stringToDisplay != null ? "${stringToDisplay}" : "${formatDateTime(dateToDisplay)}")
       ],
     );
   }
@@ -92,6 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
   };
   DateTime? _lastUpdatedAt;
   DateTime? _lastPhotoTakenAt;
+  String? _timeRemainingForTimelapse;
 
   @override
   void initState() {
@@ -152,6 +152,7 @@ class _MyHomePageState extends State<MyHomePage> {
             'Free': double.parse((data['stats']['memory']['Free'] / (1024 * 1024 * 1024))
                 .toStringAsFixed(2)),
           };
+          _timeRemainingForTimelapse = data['stats']['memory']['TimeRemainingForTimelapse'];
         }
 
         if (shouldUpdateDate) {
@@ -176,14 +177,20 @@ class _MyHomePageState extends State<MyHomePage> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              _DateInfo(
+              InfoText(
                   dateToDisplay: _lastUpdatedAt, helpText: "Data updated at:"
               ),
               SizedBox(height: 4),
-              _DateInfo(
+              InfoText(
                   dateToDisplay: _lastPhotoTakenAt,
                   helpText: "Last photo taken at:"
               ),
+              SizedBox(height: 4),
+              InfoText(
+                  stringToDisplay: _timeRemainingForTimelapse,
+                  helpText: "Disk space will last for:"
+              ),
+
             ],
           ),
         ),
