@@ -8,21 +8,39 @@ import 'package:web_socket_channel/html.dart';
 import 'system_stats.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Timelapse',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+      theme: ThemeData.from(
+        colorScheme: ColorScheme.fromSwatch(
+            primarySwatch: Colors.blue,
+          // brightness: Brightness.dark
+        ),
+        textTheme: Theme.of(context).textTheme?.copyWith(
+
+          headlineSmall: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+          headlineMedium: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+          ),
+          headlineLarge: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 32,
+          ),
+        )
       ),
+
       home: const MyHomePage(title: 'Timelapse'),
     );
   }
@@ -209,22 +227,18 @@ class _MyHomePageState extends State<MyHomePage> {
       return Row(
         children: [
           Expanded(flex: 3, child: CpuStatsWidget(cpuData: _cpuStats)),
-          Expanded(flex: 5, child: RamStatsWidget(ramData: _ramStats)),
-          Expanded(flex: 2, child: MemoryStatsWidget(memData: _memoryStats)),
+          Expanded(flex: 6, child: RamStatsWidget(ramData: _ramStats)),
+          Expanded(flex: 3, child: MemoryStatsWidget(memData: _memoryStats)),
         ],
       );
     } else {
       return Column(
         children: [
           SizedBox(
-              // height: 180,
               child: CpuStatsWidget(cpuData: _cpuStats)),
-          // const SizedBox(width: 18),
           SizedBox(
-              // height: 180,
               child: RamStatsWidget(ramData: _ramStats)),
           SizedBox(
-              // height: 180,
               child: MemoryStatsWidget(memData: _memoryStats)),
         ],
       );
@@ -247,6 +261,23 @@ class _MyHomePageState extends State<MyHomePage> {
                   _getStatusBar(),
                   const SizedBox(height: 8),
                   _getWidgets(isTablet),
+                  Card(
+                    child: Padding(
+                      
+                      padding: EdgeInsets.all(12),
+                      child: Expanded(
+                        child: Row(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {  },
+                              child: Text("Remove all images"),
+                            )
+                          ],
+                        )
+
+                      ),
+                    ),
+                  )
                 ],
               ))
           : Container(),
