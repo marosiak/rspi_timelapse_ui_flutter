@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:rspi_timelapse_web/responsive.dart';
 
 abstract class StatsWidget extends StatelessWidget {
   final Map<String, double> data;
@@ -16,9 +17,6 @@ abstract class StatsWidget extends StatelessWidget {
     required this.unit,  // Add this to the constructor
   });
 
-  bool isPhone(BuildContext context) {
-    return MediaQuery.of(context).size.width < 595;
-  }
 
   DataRow getDataRow(BuildContext context) {
     return DataRow(

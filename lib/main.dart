@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:rspi_timelapse_web/responsive.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/html.dart';
 import 'system_stats.dart';
@@ -36,6 +37,10 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+String abc() {
+  return "";
+}
+
 class InfoText extends StatelessWidget {
   DateTime? dateToDisplay;
   String? stringToDisplay;
@@ -53,21 +58,22 @@ class InfoText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
     return Row(
       children: [
         Text(helpText,
-            style: width > 375
+            style: isSmallPhone(context)
                 ? Theme.of(context)
                     .textTheme
-                    .bodyLarge
+                    .bodyMedium
                     ?.copyWith(fontWeight: FontWeight.bold)
                 : Theme.of(context)
                     .textTheme
-                    .bodyMedium
+                    .bodyLarge
                     ?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(width: 8),
-        Text(stringToDisplay != null ? "${stringToDisplay}" : "${formatDateTime(dateToDisplay)}")
+        Text(stringToDisplay != null
+            ? "${stringToDisplay}"
+            : "${formatDateTime(dateToDisplay)}")
       ],
     );
   }
@@ -75,6 +81,7 @@ class InfoText extends StatelessWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final channel = HtmlWebSocketChannel.connect('ws://raspberrypi.local/ws');
+
   // final channel = HtmlWebSocketChannel.connect('ws://localhost/ws');
   late Timer _timer;
   Map<String, double> _cpuStats = {'User': 0, 'System': 0, 'Idle': 0};
@@ -85,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
     'SwapUsed': 0
   };
 
-  Map <String, double> _memoryStats = {
+  Map<String, double> _memoryStats = {
     'Total': 3,
     'Free': 1,
   };
@@ -147,12 +154,14 @@ class _MyHomePageState extends State<MyHomePage> {
         if (data['stats']['memory'] != null) {
           _memoryStats = {
             'Total': double.parse(
-            (data['stats']['memory']['Total'] / (1024 * 1024 * 1024))
-                .toStringAsFixed(2)),
-            'Free': double.parse((data['stats']['memory']['Free'] / (1024 * 1024 * 1024))
-                .toStringAsFixed(2)),
+                (data['stats']['memory']['Total'] / (1024 * 1024 * 1024))
+                    .toStringAsFixed(2)),
+            'Free': double.parse(
+                (data['stats']['memory']['Free'] / (1024 * 1024 * 1024))
+                    .toStringAsFixed(2)),
           };
-          _timeRemainingForTimelapse = data['stats']['memory']['TimeRemainingForTimelapse'];
+          _timeRemainingForTimelapse =
+              data['stats']['memory']['TimeRemainingForTimelapse'];
         }
 
         if (shouldUpdateDate) {
@@ -170,6 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _getStatusBar() {
+    double width = MediaQuery.of(context).size.width;
     return ConstrainedBox(
       constraints: BoxConstraints(minWidth: 200),
       child: Card(
@@ -178,19 +188,15 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             children: [
               InfoText(
-                  dateToDisplay: _lastUpdatedAt, helpText: "Data updated at:"
-              ),
+                  dateToDisplay: _lastUpdatedAt, helpText: "Data updated at:"),
               SizedBox(height: 4),
               InfoText(
                   dateToDisplay: _lastPhotoTakenAt,
-                  helpText: "Last photo taken at:"
-              ),
+                  helpText: "Last photo taken at:"),
               SizedBox(height: 4),
               InfoText(
                   stringToDisplay: _timeRemainingForTimelapse,
-                  helpText: "Disk space will last for:"
-              ),
-
+                  helpText: width < 430 ? "Disk space for:" : "Disk space will last for:"),
             ],
           ),
         ),
@@ -202,18 +208,9 @@ class _MyHomePageState extends State<MyHomePage> {
     if (isHorizontal) {
       return Row(
         children: [
-          Expanded(
-            flex: 3,
-              child: CpuStatsWidget(cpuData: _cpuStats)
-          ),
-          Expanded(
-              flex: 5,
-              child: RamStatsWidget(ramData: _ramStats)
-          ),
-          Expanded(
-              flex: 2,
-              child: MemoryStatsWidget(memData: _memoryStats)
-          ),
+          Expanded(flex: 3, child: CpuStatsWidget(cpuData: _cpuStats)),
+          Expanded(flex: 5, child: RamStatsWidget(ramData: _ramStats)),
+          Expanded(flex: 2, child: MemoryStatsWidget(memData: _memoryStats)),
         ],
       );
     } else {
@@ -228,8 +225,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: RamStatsWidget(ramData: _ramStats)),
           SizedBox(
               // height: 180,
-              child: MemoryStatsWidget(memData: _memoryStats)
-          ),
+              child: MemoryStatsWidget(memData: _memoryStats)),
         ],
       );
     }
