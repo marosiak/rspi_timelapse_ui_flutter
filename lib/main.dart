@@ -25,7 +25,6 @@ class MyApp extends StatelessWidget {
           // brightness: Brightness.dark
         ),
         textTheme: Theme.of(context).textTheme?.copyWith(
-
           headlineSmall: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
@@ -96,6 +95,15 @@ class InfoText extends StatelessWidget {
     );
   }
 }
+//
+// class BackendCommunicator {
+//   final HtmlWebSocketChannel channel;
+//   late Timer _timer;
+//   BackendCommunicator()
+//       : channel = HtmlWebSocketChannel.connect('ws://raspberrypi.local/ws') {
+//     print("BackendCommunicator has been initialized.");
+//   }
+// }
 
 class _MyHomePageState extends State<MyHomePage> {
   final channel = HtmlWebSocketChannel.connect('ws://raspberrypi.local/ws');
@@ -263,13 +271,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   _getWidgets(isTablet),
                   Card(
                     child: Padding(
-                      
                       padding: EdgeInsets.all(12),
                       child: Expanded(
                         child: Row(
                           children: [
                             ElevatedButton(
-                              onPressed: () {  },
+                              onPressed: () => showDialog<String>(
+                                context: context,
+                                builder: (BuildContext context) => const RemoveFilesDialog(),
+                              ),
                               child: Text("Remove all images"),
                             )
                           ],
@@ -281,6 +291,34 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ))
           : Container(),
+    );
+  }
+}
+
+class RemoveFilesDialog extends StatelessWidget {
+  const RemoveFilesDialog({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: Theme.of(context).cardColor,
+      title: const Text('Are you sure?'),
+      content: const Text('This action will remove all images except last 10, there will be no way to retrieve it back'),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.pop(context, 'Cancel'),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () => {
+            print("a");
+            Navigator.pop(context, 'Remove')
+          },
+          child: const Text('Remove'),
+        ),
+      ],
     );
   }
 }
