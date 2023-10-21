@@ -6,6 +6,9 @@ import 'package:rspi_timelapse_web/responsive.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/html.dart';
 import 'system_stats.dart';
+import 'dart:html' as html;
+import 'package:web_socket_channel/html.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -20,26 +23,24 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Timelapse',
       theme: ThemeData.from(
-        colorScheme: ColorScheme.fromSwatch(
+          colorScheme: ColorScheme.fromSwatch(
             primarySwatch: Colors.blue,
-          // brightness: Brightness.dark
-        ),
-        textTheme: Theme.of(context).textTheme?.copyWith(
-          headlineSmall: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
+            // brightness: Brightness.dark
           ),
-          headlineMedium: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-          ),
-          headlineLarge: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 32,
-          ),
-        )
-      ),
-
+          textTheme: Theme.of(context).textTheme?.copyWith(
+                headlineSmall: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+                headlineMedium: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+                headlineLarge: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 32,
+                ),
+              )),
       home: const MyHomePage(title: 'Timelapse'),
     );
   }
@@ -63,7 +64,11 @@ class InfoText extends StatelessWidget {
   String? stringToDisplay;
   String helpText;
 
-  InfoText({this.dateToDisplay, this.stringToDisplay, required this.helpText});
+  InfoText(
+      {super.key,
+      this.dateToDisplay,
+      this.stringToDisplay,
+      required this.helpText});
 
   String? formatDateTime(DateTime? dateTime) {
     if (dateTime == null) {
@@ -95,20 +100,13 @@ class InfoText extends StatelessWidget {
     );
   }
 }
-//
-// class BackendCommunicator {
-//   final HtmlWebSocketChannel channel;
-//   late Timer _timer;
-//   BackendCommunicator()
-//       : channel = HtmlWebSocketChannel.connect('ws://raspberrypi.local/ws') {
-//     print("BackendCommunicator has been initialized.");
-//   }
-// }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final channel = HtmlWebSocketChannel.connect('ws://raspberrypi.local/ws');
+  // final channel = HtmlWebSocketChannel.connect('ws://raspberrypi.local/ws');
 
-  // final channel = HtmlWebSocketChannel.connect('ws://localhost/ws');
+  final channel = HtmlWebSocketChannel.connect('ws://localhost/ws',);
+
+
   late Timer _timer;
   Map<String, double> _cpuStats = {'User': 0, 'System': 0, 'Idle': 0};
   Map<String, double> _ramStats = {
@@ -125,6 +123,14 @@ class _MyHomePageState extends State<MyHomePage> {
   DateTime? _lastUpdatedAt;
   DateTime? _lastPhotoTakenAt;
   String? _timeRemainingForTimelapse;
+
+  void askToRemoveImages() {
+    channel.sink.add('{"action": "REMOVE_ALL_IMAGES"}');
+  }
+  
+  void authWebsocket() {
+    channel.sink.add('{"action": "AUTH", "value": "2137"}');
+  }
 
   @override
   void initState() {
@@ -222,7 +228,9 @@ class _MyHomePageState extends State<MyHomePage> {
               SizedBox(height: 4),
               InfoText(
                   stringToDisplay: _timeRemainingForTimelapse,
-                  helpText: width < 430 ? "Disk space for:" : "Disk space will last for:"),
+                  helpText: width < 430
+                      ? "Disk space for:"
+                      : "Disk space will last for:"),
             ],
           ),
         ),
@@ -242,12 +250,9 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       return Column(
         children: [
-          SizedBox(
-              child: CpuStatsWidget(cpuData: _cpuStats)),
-          SizedBox(
-              child: RamStatsWidget(ramData: _ramStats)),
-          SizedBox(
-              child: MemoryStatsWidget(memData: _memoryStats)),
+          SizedBox(child: CpuStatsWidget(cpuData: _cpuStats)),
+          SizedBox(child: RamStatsWidget(ramData: _ramStats)),
+          SizedBox(child: MemoryStatsWidget(memData: _memoryStats)),
         ],
       );
     }
@@ -272,19 +277,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   Card(
                     child: Padding(
                       padding: EdgeInsets.all(12),
-                      child: Expanded(
-                        child: Row(
-                          children: [
-                            ElevatedButton(
-                              onPressed: () => showDialog<String>(
-                                context: context,
-                                builder: (BuildContext context) => const RemoveFilesDialog(),
-                              ),
-                              child: Text("Remove all images"),
-                            )
-                          ],
-                        )
-
+                      child: Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => showDialog<String>(
+                              context: context,
+                              builder: (BuildContext context) =>
+                                  RemoveFilesDialog(
+                                      onAccepted: askToRemoveImages),
+                            ),
+                            child: Text("Remove all images"),
+                          )
+                        ],
                       ),
                     ),
                   )
@@ -295,26 +299,29 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+typedef OnAcceptedCallback = void Function();
+
 class RemoveFilesDialog extends StatelessWidget {
-  const RemoveFilesDialog({
-    super.key,
-  });
+  final OnAcceptedCallback onAccepted;
+
+  const RemoveFilesDialog({super.key, required this.onAccepted});
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: Theme.of(context).cardColor,
       title: const Text('Are you sure?'),
-      content: const Text('This action will remove all images except last 10, there will be no way to retrieve it back'),
+      content: const Text(
+          'This action will remove all images except last 10, there will be no way to retrieve it back'),
       actions: <Widget>[
         TextButton(
           onPressed: () => Navigator.pop(context, 'Cancel'),
           child: const Text('Cancel'),
         ),
         ElevatedButton(
-          onPressed: () => {
-            print("a");
-            Navigator.pop(context, 'Remove')
+          onPressed: () {
+            onAccepted();
+            Navigator.pop(context, 'Remove');
           },
           child: const Text('Remove'),
         ),
