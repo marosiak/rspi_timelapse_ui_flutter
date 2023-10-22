@@ -1,23 +1,45 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:web_socket_channel/html.dart';
 
 import '../responsive.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key, required this.title});
+  const LoginPage({super.key, required this.title, required this.channel});
 
   final String title;
+  final HtmlWebSocketChannel channel;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+
+  @override
+  void dispose() {
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  void login() {
+    widget.channel.sink.add('{"action": "AUTH", "value": "${passwordController.text}"}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: null,
         body: Padding(
-          padding: isPhone(context) ? EdgeInsets.all(8.0) : EdgeInsets.all(18.0),
+          padding: isPhone(context) ? const EdgeInsets.all(8.0) : const EdgeInsets.all(18.0),
           child: Center(
             child: FittedBox(
               fit: BoxFit.contain,
@@ -38,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
                             size: 35,
                             color: Theme.of(context).primaryColor,
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
                             "Timelapse Auth",
                             style: Theme.of(context).textTheme.headlineLarge,
@@ -50,9 +72,10 @@ class _LoginPageState extends State<LoginPage> {
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                         const SizedBox(height: 12),
-                        const TextField(
+                        TextField(
                           obscureText: true,
-                          decoration: InputDecoration(
+                          controller: passwordController,
+                          decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Password',
                           ),
@@ -62,8 +85,8 @@ class _LoginPageState extends State<LoginPage> {
                           style: ElevatedButton.styleFrom(
                             minimumSize: Size(double.infinity, 50),
                           ),
-                          onPressed: () {},
-                          child: Text(
+                          onPressed: login,
+                          child: const Text(
                             "Login",
                             style: TextStyle(
                               fontSize: 18, // Ustaw rozmiar czcionki na 24

@@ -11,7 +11,7 @@ import '../components/system_stats.dart';
 class _HomePageState extends State<HomePage> {
   // final channel = HtmlWebSocketChannel.connect('ws://raspberrypi.local/ws');
 
-  final channel = HtmlWebSocketChannel.connect('ws://localhost/ws',);
+  final channel = HtmlWebSocketChannel.connect('ws://localhost/ws');
 
 
   late Timer _timer;
