@@ -16,17 +16,9 @@ class _HomePageState extends State<HomePage> {
 
   late Timer _timer;
   Map<String, double> _cpuStats = {'User': 0, 'System': 0, 'Idle': 0};
-  Map<String, double> _ramStats = {
-    'Total': 0,
-    'Used': 0,
-    'SwapTotal': 0,
-    'SwapUsed': 0
-  };
+  Map<String, double> _ramStats = {'Total': 0, 'Used': 0, 'SwapTotal': 0, 'SwapUsed': 0};
 
-  Map<String, double> _memoryStats = {
-    'Total': 3,
-    'Free': 1,
-  };
+  Map<String, double> _memoryStats = {'Total': 3, 'Free': 1,};
   DateTime? _lastUpdatedAt;
   DateTime? _lastPhotoTakenAt;
   String? _timeRemainingForTimelapse;
@@ -40,74 +32,71 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void didUpdateWidget(HomePage oldWidget){
+    bool shouldUpdateDate = false;
+
+    dynamic stats = widget.statisticsData;
+    setState(() {
+      if (stats['lastPhotoTakenAt'] != null) {
+        _lastPhotoTakenAt = DateTime.fromMillisecondsSinceEpoch(
+            stats['lastPhotoTakenAt'] * 1000);
+      }
+
+      if (stats['cpu'] != null) {
+        _cpuStats = {
+          'User':
+          double.parse(stats['cpu']['User'].toStringAsFixed(2)),
+          'System':
+          double.parse(stats['cpu']['System'].toStringAsFixed(2)),
+          'Idle':
+          double.parse(stats['cpu']['Idle'].toStringAsFixed(2)),
+        };
+        shouldUpdateDate = true;
+      }
+
+      if (stats['ram'] != null) {
+        _ramStats = {
+          'Total': double.parse(
+              (stats['ram']['Total'] / (1024 * 1024))
+                  .toStringAsFixed(2)),
+          'Used': double.parse((stats['ram']['Used'] / (1024 * 1024))
+              .toStringAsFixed(2)),
+          'SwapTotal': double.parse(((stats['ram']['SwapTotal'] ??
+              stats['ram']['VirtualTotal']) /
+              (1024 * 1024))
+              .toStringAsFixed(2)),
+          'SwapUsed': double.parse(((stats['ram']['SwapUsed'] ??
+              (stats['ram']['VirtualTotal'] -
+                  stats['ram']['VirtualFree'])) /
+              (1024 * 1024))
+              .toStringAsFixed(2)),
+        };
+        shouldUpdateDate = true;
+      }
+
+      if (stats['memory'] != null) {
+        _memoryStats = {
+          'Total': double.parse(
+              (stats['memory']['Total'] / (1024 * 1024 * 1024))
+                  .toStringAsFixed(2)),
+          'Free': double.parse(
+              (stats['memory']['Free'] / (1024 * 1024 * 1024))
+                  .toStringAsFixed(2)),
+        };
+        _timeRemainingForTimelapse =
+        stats['memory']['TimeRemainingForTimelapse'];
+      }
+
+      if (shouldUpdateDate) {
+        _lastUpdatedAt = DateTime.now();
+      }
+    });
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   void initState() {
     super.initState();
-    channel.sink.add('');
-
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      channel.sink.add('');
-    });
-
-    channel.stream.listen((response) {
-      final Map<String, dynamic> data = jsonDecode(response);
-      bool shouldUpdateDate = false;
-
-      setState(() {
-        if (data['lastPhotoTakenAt'] != null) {
-          _lastPhotoTakenAt = DateTime.fromMillisecondsSinceEpoch(
-              data['lastPhotoTakenAt'] * 1000);
-        }
-
-        if (data['stats']['cpu'] != null) {
-          _cpuStats = {
-            'User':
-            double.parse(data['stats']['cpu']['User'].toStringAsFixed(2)),
-            'System':
-            double.parse(data['stats']['cpu']['System'].toStringAsFixed(2)),
-            'Idle':
-            double.parse(data['stats']['cpu']['Idle'].toStringAsFixed(2)),
-          };
-          shouldUpdateDate = true;
-        }
-
-        if (data['stats']['ram'] != null) {
-          _ramStats = {
-            'Total': double.parse(
-                (data['stats']['ram']['Total'] / (1024 * 1024))
-                    .toStringAsFixed(2)),
-            'Used': double.parse((data['stats']['ram']['Used'] / (1024 * 1024))
-                .toStringAsFixed(2)),
-            'SwapTotal': double.parse(((data['stats']['ram']['SwapTotal'] ??
-                data['stats']['ram']['VirtualTotal']) /
-                (1024 * 1024))
-                .toStringAsFixed(2)),
-            'SwapUsed': double.parse(((data['stats']['ram']['SwapUsed'] ??
-                (data['stats']['ram']['VirtualTotal'] -
-                    data['stats']['ram']['VirtualFree'])) /
-                (1024 * 1024))
-                .toStringAsFixed(2)),
-          };
-          shouldUpdateDate = true;
-        }
-
-        if (data['stats']['memory'] != null) {
-          _memoryStats = {
-            'Total': double.parse(
-                (data['stats']['memory']['Total'] / (1024 * 1024 * 1024))
-                    .toStringAsFixed(2)),
-            'Free': double.parse(
-                (data['stats']['memory']['Free'] / (1024 * 1024 * 1024))
-                    .toStringAsFixed(2)),
-          };
-          _timeRemainingForTimelapse =
-          data['stats']['memory']['TimeRemainingForTimelapse'];
-        }
-
-        if (shouldUpdateDate) {
-          _lastUpdatedAt = DateTime.now();
-        }
-      });
-    });
   }
 
   @override
@@ -207,9 +196,10 @@ class _HomePageState extends State<HomePage> {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
+  const HomePage({super.key, required this.title, this.statisticsData});
 
   final String title;
+  final dynamic statisticsData;
 
   @override
   State<HomePage> createState() => _HomePageState();

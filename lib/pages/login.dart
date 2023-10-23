@@ -1,13 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:web_socket_channel/html.dart';
 
 import '../responsive.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key, required this.title, required this.channel});
+  LoginPage(
+      {super.key, required this.title, required this.channel, this.errorMsg});
 
+  String? errorMsg;
   final String title;
   final HtmlWebSocketChannel channel;
 
@@ -23,7 +26,6 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
   }
 
-
   @override
   void dispose() {
     passwordController.dispose();
@@ -31,7 +33,12 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void login() {
-    widget.channel.sink.add('{"action": "AUTH", "value": "${passwordController.text}"}');
+    widget.channel.sink
+        .add('{"action": "AUTH", "value": "${passwordController.text}"}');
+  }
+
+  void loginSubmit(String input) {
+    login();
   }
 
   @override
@@ -39,7 +46,9 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
         appBar: null,
         body: Padding(
-          padding: isPhone(context) ? const EdgeInsets.all(8.0) : const EdgeInsets.all(18.0),
+          padding: isPhone(context)
+              ? const EdgeInsets.all(8.0)
+              : const EdgeInsets.all(18.0),
           child: Center(
             child: FittedBox(
               fit: BoxFit.contain,
@@ -74,11 +83,13 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 12),
                         TextField(
                           obscureText: true,
+                          autofocus: true,
+                          onSubmitted: loginSubmit,
                           controller: passwordController,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Password',
-                          ),
+                          decoration: InputDecoration(
+                              border: const OutlineInputBorder(),
+                              labelText: 'Password',
+                              errorText: widget.errorMsg),
                         ),
                         const SizedBox(height: 12),
                         ElevatedButton(
