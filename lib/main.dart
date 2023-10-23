@@ -57,7 +57,7 @@ class _MyAppState extends State<MyApp> {
 @override
 void initState() {
   super.initState();
-  channel = HtmlWebSocketChannel.connect('ws://localhost/ws');
+  channel = HtmlWebSocketChannel.connect('ws://raspberrypi.local/ws');
   channel.stream.listen(readSocketData);
   channel.sink.add(""); // Hey ws, I am ready to understand ur communication
 }
@@ -68,7 +68,7 @@ Widget build(BuildContext context) {
     title: 'Timelapse',
     theme: defaultTheme(context),
     home: isLogged
-        ? HomePage(title: 'Timelapse', statisticsData: statisticsData)
+        ? HomePage(title: 'Timelapse', channel: channel, statisticsData: statisticsData)
         : LoginPage(title: "Timelapse Login", channel: channel, errorMsg: errorMsg),
   );
 }}

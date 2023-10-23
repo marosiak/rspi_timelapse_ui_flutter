@@ -9,11 +9,6 @@ import '../components/info_text.dart';
 import '../components/system_stats.dart';
 
 class _HomePageState extends State<HomePage> {
-  // final channel = HtmlWebSocketChannel.connect('ws://raspberrypi.local/ws');
-
-  final channel = HtmlWebSocketChannel.connect('ws://localhost/ws');
-
-
   late Timer _timer;
   Map<String, double> _cpuStats = {'User': 0, 'System': 0, 'Idle': 0};
   Map<String, double> _ramStats = {'Total': 0, 'Used': 0, 'SwapTotal': 0, 'SwapUsed': 0};
@@ -24,12 +19,8 @@ class _HomePageState extends State<HomePage> {
   String? _timeRemainingForTimelapse;
 
   void askToRemoveImages() {
-    channel.sink.add('{"action": "REMOVE_ALL_IMAGES"}');
-  }
-
-  void authWebsocket() {
-    channel.sink.add('{"action": "AUTH", "value": "2137"}');
-  }
+    widget.channel.sink.add('{"action": "REMOVE_ALL_IMAGES"}');
+  } 
 
   @override
   void didUpdateWidget(HomePage oldWidget){
@@ -97,13 +88,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    channel.sink.close();
-    super.dispose();
   }
 
   Widget _getStatusBar() {
@@ -196,10 +180,11 @@ class _HomePageState extends State<HomePage> {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title, this.statisticsData});
+  const HomePage({super.key, required this.title, required this.channel, this.statisticsData});
 
   final String title;
   final dynamic statisticsData;
+  final HtmlWebSocketChannel channel;
 
   @override
   State<HomePage> createState() => _HomePageState();

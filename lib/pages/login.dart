@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:web_socket_channel/html.dart';
-
+import 'dart:html';
 import '../responsive.dart';
 
 class LoginPage extends StatefulWidget {
@@ -33,8 +33,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void login() {
-    widget.channel.sink
-        .add('{"action": "AUTH", "value": "${passwordController.text}"}');
+    widget.channel.sink.add('{"action": "AUTH", "value": "${passwordController.text}"}');
   }
 
   void loginSubmit(String input) {
