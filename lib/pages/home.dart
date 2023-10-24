@@ -149,30 +149,32 @@ class _HomePageState extends State<HomePage> {
       body: _lastUpdatedAt != null
           ? Padding(
           padding: const EdgeInsets.all(18.0),
-          child: Column(
-            children: [
-              _getStatusBar(),
-              const SizedBox(height: 8),
-              _getWidgets(isTablet),
-              Card(
-                child: Padding(
-                  padding: EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () => showDialog<String>(
-                          context: context,
-                          builder: (BuildContext context) =>
-                              RemoveFilesDialog(
-                                  onAccepted: askToRemoveImages),
-                        ),
-                        child: Text("Remove all images"),
-                      )
-                    ],
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                _getStatusBar(),
+                const SizedBox(height: 8),
+                _getWidgets(isTablet),
+                Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () => showDialog<String>(
+                            context: context,
+                            builder: (BuildContext context) =>
+                                RemoveFilesDialog(
+                                    onAccepted: askToRemoveImages),
+                          ),
+                          child: Text("Remove all images"),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ))
           : Container(),
     );
