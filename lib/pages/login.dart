@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:web_socket_channel/html.dart';
-import 'dart:html';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../responsive.dart';
 
 class LoginPage extends StatefulWidget {
@@ -20,20 +21,39 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
+  bool shouldRememberPassword = false;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? savedPassword = prefs.getString('password');
+      if (savedPassword != null) {
+        passwordController.text = savedPassword;
+        login();
+      }
+      isLoading = false;
+    });
+
   }
 
   @override
-  void dispose() {
+  Future<void> dispose() async {
+    if (shouldRememberPassword) {
+      WidgetsBinding.instance!.addPostFrameCallback((_) async {
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('password', passwordController.text);
+      });
+    }
     passwordController.dispose();
     super.dispose();
   }
 
   void login() {
-    widget.channel.sink.add('{"action": "AUTH", "value": "${passwordController.text}"}');
+    widget.channel.sink
+        .add('{"action": "AUTH", "value": "${passwordController.text}"}');
   }
 
   void loginSubmit(String input) {
@@ -48,7 +68,11 @@ class _LoginPageState extends State<LoginPage> {
           padding: isPhone(context)
               ? const EdgeInsets.all(8.0)
               : const EdgeInsets.all(18.0),
-          child: Center(
+          child: isLoading ? Center(
+            child: LoadingAnimationWidget.staggeredDotsWave(
+              color: Colors.white,
+              size: 200,
+            )) : Center(
             child: FittedBox(
               fit: BoxFit.contain,
               child: ConstrainedBox(
@@ -89,6 +113,40 @@ class _LoginPageState extends State<LoginPage> {
                               border: const OutlineInputBorder(),
                               labelText: 'Password',
                               errorText: widget.errorMsg),
+                        ),
+                        SizedBox(height: 8),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              shouldRememberPassword = !shouldRememberPassword;
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 0),
+                                  child: IgnorePointer(
+                                    ignoring: true,
+                                    child: Checkbox(
+                                      focusNode: FocusNode(skipTraversal: true),
+                                      value: shouldRememberPassword,
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          shouldRememberPassword = value!;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 4),
+                                Text("Keep me logged"),
+                              ],
+                            ),
+                          ),
                         ),
                         const SizedBox(height: 12),
                         ElevatedButton(
