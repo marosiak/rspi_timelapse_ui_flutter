@@ -5,14 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:rspi_timelapse_web/pages/home.dart';
 import 'package:rspi_timelapse_web/pages/login.dart';
 import 'package:rspi_timelapse_web/theme.dart';
-import 'package:web_socket_channel/html.dart';
+
+
+import 'package:rspi_timelapse_web/websocket/ws.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 void main() {
   runApp(MyApp());
 }
 
+
 class _MyAppState extends State<MyApp> {
-  late HtmlWebSocketChannel channel;
+  final websocket = Websocket('ws://raspberrypi.local/ws');
+  late WebSocketChannel channel = websocket.getWebSocketChannel();
   dynamic statisticsData;
   String? errorMsg;
   Timer ?_timer;
@@ -57,7 +62,6 @@ class _MyAppState extends State<MyApp> {
 @override
 void initState() {
   super.initState();
-  channel = HtmlWebSocketChannel.connect('ws://raspberrypi.local/ws');
   channel.stream.listen(readSocketData);
   channel.sink.add(""); // Hey ws, I am ready to understand ur communication
 }

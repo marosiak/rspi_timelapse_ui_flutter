@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:web_socket_channel/html.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 import '../responsive.dart';
 
 class LoginPage extends StatefulWidget {
@@ -13,7 +13,7 @@ class LoginPage extends StatefulWidget {
 
   String? errorMsg;
   final String title;
-  final HtmlWebSocketChannel channel;
+  final WebSocketChannel channel;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
