@@ -1,22 +1,23 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:rspi_timelapse_web/models/statistics.dart';
 import 'package:rspi_timelapse_web/responsive.dart';
 
 abstract class StatsWidget extends StatelessWidget {
-  final Map<String, double> data;
+  final Map<String, String> data;
   final String title;
   final IconData icon;
   final Map<String, String> columnMapping;
-  final String unit; // Add this field
+  final String unit;
 
   const StatsWidget({
-    super.key,
+    Key? key,
     required this.data,
     required this.title,
     required this.icon,
     required this.columnMapping,
-    required this.unit, // Add this to the constructor
-  });
+    required this.unit,
+  }) : super(key: key);
 
   DataRow getDataRow(BuildContext context) {
     return DataRow(
@@ -34,16 +35,13 @@ abstract class StatsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Theme.of(context).cardColor,
       child: Padding(
-        padding: isPhone(context) ? EdgeInsets.all(8.0) : EdgeInsets.all(15.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextIconHeader(icon: icon, title: title),
             DataTable(
-              columnSpacing: isPhone(context) ? 10 : 25,
               columns: columnMapping.entries
                   .map((entry) => DataColumn(
                         label: Expanded(
@@ -72,80 +70,77 @@ abstract class StatsWidget extends StatelessWidget {
 }
 
 class TextIconHeader extends StatelessWidget {
-  const TextIconHeader({
-    super.key,
-    required this.icon,
-    required this.title,
-  });
-
   final IconData icon;
   final String title;
+
+  const TextIconHeader({Key? key, required this.icon, required this.title})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(
-            icon,
-            size: isPhone(context) ? 32 : 38,
-          color: Theme.of(context).primaryColor,
-        ),
-        const SizedBox(width: 8),
-        Text(title,
-            style: isPhone(context)
-                ? Theme.of(context)
-                    .textTheme
-                    .headlineSmall
-                : Theme.of(context)
-                    .textTheme
-                    .headlineMedium)
+        Icon(icon),
+        SizedBox(width: 8.0),
+        Text(title),
       ],
     );
   }
 }
 
 class CpuStatsWidget extends StatsWidget {
-  CpuStatsWidget({required Map<String, double> cpuData})
+  CpuStatsWidget({required Cpu cpu})
       : super(
-          data: cpuData,
-          title: 'CPU',
-          icon: Icons.memory,
-          columnMapping: {
-            'Idle': 'Idle',
-            'System': 'System',
-            'User': 'User',
-          },
-          unit: '%', // Add unit here
-        );
+    data: {
+      'User': cpu.userToPercent(),
+      'System': cpu.systemToPercent(),
+      'Idle': cpu.idleToPercent(),
+    },
+    title: 'CPU',
+    icon: Icons.memory,
+    columnMapping: {
+      'User': 'User',
+      'System': 'System',
+      'Idle': 'Idle',
+    },
+    unit: '%',
+  );
 }
 
 class RamStatsWidget extends StatsWidget {
-  RamStatsWidget({super.key, required Map<String, double> ramData})
+  RamStatsWidget({required Ram ram})
       : super(
-          data: ramData,
-          title: 'Ram',
-          icon: Icons.dns,
-          columnMapping: {
-            'Total': 'Total',
-            'Used': 'Used',
-            'SwapTotal': 'Total Swap',
-            'SwapUsed': 'Used Swap',
-          },
-          unit: 'MB', // Add unit here
-        );
+    data: {
+      'Total': ram.totalToGB(),
+      'Free': ram.freeToGB(),
+      'SwapTotal': ram.swapTotalToString(),
+      'SwapUsed': ram.swapUsedToString(),
+    },
+    title: 'RAM',
+    icon: Icons.dns,
+    columnMapping: {
+      'Total': 'Total',
+      'Free': 'Free',
+      'SwapTotal': 'Total Swap',
+      'SwapUsed': 'Used Swap',
+    },
+    unit: 'GB',
+  );
 }
 
 class MemoryStatsWidget extends StatsWidget {
-  MemoryStatsWidget({super.key, required Map<String, double> memData})
+  MemoryStatsWidget({required Memory memory})
       : super(
-          data: memData,
-          title: 'Memory',
-          icon: Icons.sd_storage,
-          columnMapping: {
-            'Total': 'Total',
-            'Free': 'Free',
-          },
-          unit: 'GB', // Add unit here
-        );
+    data: {
+      'Total': memory.totalToGB(),
+      'Free': memory.freeToGB(),
+    },
+    title: 'Memory',
+    icon: Icons.sd_storage,
+    columnMapping: {
+      'Total': 'Total',
+      'Free': 'Free',
+    },
+    unit: 'GB',
+  );
 }

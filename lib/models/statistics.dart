@@ -1,30 +1,32 @@
+import 'dart:convert';
+
 class StatsResponse {
   Ram? ram;
   Cpu? cpu;
   Memory? memory;
-  int? lastPhotoTakenAt;
+  DateTime? lastPhotoTakenAt;
 
   StatsResponse({this.ram, this.cpu, this.memory, this.lastPhotoTakenAt});
 
-  StatsResponse.fromJson(Map<String, dynamic> json) {
+  StatsResponse.fromJson(Map<dynamic, dynamic> json) {
     ram = json['ram'] != null ? Ram.fromJson(json['ram']) : null;
     cpu = json['cpu'] != null ? Cpu.fromJson(json['cpu']) : null;
     memory = json['memory'] != null ? Memory.fromJson(json['memory']) : null;
-    lastPhotoTakenAt = json['lastPhotoTakenAt'];
+    lastPhotoTakenAt = json['lastPhotoTakenAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['lastPhotoTakenAt']*1000) : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (ram != null) {
-      data['ram'] = this.ram!.toJson();
+      data['ram'] = ram!.toJson();
     }
     if (cpu != null) {
-      data['cpu'] = this.cpu!.toJson();
+      data['cpu'] = cpu!.toJson();
     }
     if (memory != null) {
-      data['memory'] = this.memory!.toJson();
+      data['memory'] = memory!.toJson();
     }
-    data['lastPhotoTakenAt'] = this.lastPhotoTakenAt;
+    data['lastPhotoTakenAt'] = ((lastPhotoTakenAt?.millisecondsSinceEpoch)!/1000);
     return data;
   }
 }
@@ -138,5 +140,4 @@ class Memory {
   String freeToGB() {
     return (_free! / (1024 * 1024 * 1024)).toStringAsFixed(2);
   }
-
 }

@@ -10,15 +10,17 @@ import 'package:rspi_timelapse_web/theme.dart';
 import 'package:rspi_timelapse_web/websocket/ws.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import 'models/statistics.dart';
+
 void main() {
   runApp(MyApp());
 }
 
 
 class _MyAppState extends State<MyApp> {
-  final websocket = Websocket('ws://raspberrypi.local/ws');
+  final websocket = Websocket('ws://localhost/ws');
   late WebSocketChannel channel = websocket.getWebSocketChannel();
-  dynamic statisticsData;
+  dynamic statisticsResponse;
   String? errorMsg;
   Timer ?_timer;
   bool isLogged = false;
@@ -43,11 +45,9 @@ class _MyAppState extends State<MyApp> {
         });
       }
     }
-
-    if (valueMap['stats'] != null) {
+    if (valueMap['memory'] != null) {
       setState(() {
-        statisticsData = valueMap['stats'];
-        statisticsData['lastPhotoTakenAt'] = valueMap['lastPhotoTakenAt'];
+        statisticsResponse = StatsResponse.fromJson(valueMap);
       });
     }
     if (isLogged == true && _timer == null) {
@@ -72,7 +72,7 @@ Widget build(BuildContext context) {
     title: 'Timelapse',
     theme: defaultTheme(context),
     home: isLogged
-        ? HomePage(title: 'Timelapse', channel: channel, statisticsData: statisticsData)
+        ? HomePage(title: 'Timelapse', channel: channel, statistics: statisticsResponse)
         : LoginPage(title: "Timelapse Login", channel: channel, errorMsg: errorMsg),
   );
 }}
