@@ -6,6 +6,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../components/dialogs.dart';
 import '../components/info_text.dart';
+import '../components/status.dart';
 import '../components/system_stats.dart';
 import '../models/statistics.dart';
 
@@ -29,34 +30,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
-  Widget _getStatusBar(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    return ConstrainedBox(
-      constraints: const BoxConstraints(minWidth: 200),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              InfoText(
-                  dateToDisplay: _lastUpdatedAt, helpText: "Data updated at:"),
-              const SizedBox(height: 4),
-              InfoText(
-                  dateToDisplay: widget.statistics!.lastPhotoTakenAt,
-                  helpText: "Last photo taken at:"),
-              const SizedBox(height: 4),
-              InfoText(
-                  stringToDisplay:
-                      widget.statistics?.memory?.timeRemainingForTimelapse,
-                  helpText: width < 430
-                      ? "Disk space for:"
-                      : "Disk space will last for:"),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,9 +45,9 @@ class _HomePageState extends State<HomePage> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    _getStatusBar(context),
+                    StatusBar(lastUpdatedAt: _lastUpdatedAt, statistics: widget.statistics),
                     const SizedBox(height: 8),
-                    StatsView(isTablet: isTablet, statistics: widget.statistics,),
+                    StatsView(isTablet: isTablet, statistics: widget.statistics),
                     Card(
                       child: Padding(
                         padding: const EdgeInsets.all(12),
@@ -101,44 +74,6 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class StatsView extends StatelessWidget {
-  const StatsView({
-    super.key, this.statistics, required this.isTablet,
-  });
-
-  final StatsResponse? statistics;
-  final bool isTablet;
-
-  @override
-  Widget build(BuildContext context) {
-    if (statistics == null ||
-        statistics!.cpu == null ||
-        statistics!.ram == null ||
-        statistics!.memory == null) {
-      return Container();
-    }
-    if (isTablet) {
-      return Row(
-        children: [
-          Expanded(
-              flex: 4, child: CpuStatsWidget(cpu: statistics!.cpu!)),
-          Expanded(
-              flex: 7, child: RamStatsWidget(ram: statistics!.ram!)),
-          Expanded(
-              flex: 3, child: MemoryStatsWidget(memory: statistics!.memory!)),
-        ],
-      );
-    } else {
-      return Column(
-        children: [
-          CpuStatsWidget(cpu: statistics!.cpu!),
-          RamStatsWidget(ram: statistics!.ram!),
-          MemoryStatsWidget(memory: statistics!.memory!),
-        ],
-      );
-    }
-  }
-}
 
 class HomePage extends StatefulWidget {
   const HomePage(

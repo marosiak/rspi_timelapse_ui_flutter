@@ -144,3 +144,42 @@ class MemoryStatsWidget extends StatsWidget {
     unit: 'GB',
   );
 }
+
+class StatsView extends StatelessWidget {
+  const StatsView({
+    super.key, this.statistics, required this.isTablet,
+  });
+
+  final StatsResponse? statistics;
+  final bool isTablet;
+
+  @override
+  Widget build(BuildContext context) {
+    if (statistics == null ||
+        statistics!.cpu == null ||
+        statistics!.ram == null ||
+        statistics!.memory == null) {
+      return Container();
+    }
+    if (isTablet) {
+      return Row(
+        children: [
+          Expanded(
+              flex: 4, child: CpuStatsWidget(cpu: statistics!.cpu!)),
+          Expanded(
+              flex: 7, child: RamStatsWidget(ram: statistics!.ram!)),
+          Expanded(
+              flex: 3, child: MemoryStatsWidget(memory: statistics!.memory!)),
+        ],
+      );
+    } else {
+      return Column(
+        children: [
+          CpuStatsWidget(cpu: statistics!.cpu!),
+          RamStatsWidget(ram: statistics!.ram!),
+          MemoryStatsWidget(memory: statistics!.memory!),
+        ],
+      );
+    }
+  }
+}

@@ -84,6 +84,3 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-String abc() {
-  return "";
-}

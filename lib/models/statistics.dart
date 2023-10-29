@@ -86,7 +86,6 @@ class Cpu {
   Cpu({this.user, this.system, this.idle});
 
   Cpu.fromJson(Map<String, dynamic> json) {
-    print("cpu form json: $json");
     user = json['User'].toDouble();
     system = json['System'].toDouble();
     idle = json['Idle'].toDouble();
