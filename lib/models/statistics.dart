@@ -79,23 +79,24 @@ class Ram {
 }
 
 class Cpu {
-  int? user;
-  int? system;
-  int? idle;
+  double? user;
+  double? system;
+  double? idle;
 
   Cpu({this.user, this.system, this.idle});
 
   Cpu.fromJson(Map<String, dynamic> json) {
-    user = json['User'];
-    system = json['System'];
-    idle = json['Idle'];
+    print("cpu form json: $json");
+    user = json['User'].toDouble();
+    system = json['System'].toDouble();
+    idle = json['Idle'].toDouble();
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['User'] = this.user;
-    data['System'] = this.system;
-    data['Idle'] = this.idle;
+    data['User'] = user;
+    data['System'] = system;
+    data['Idle'] = idle;
     return data;
   }
 
@@ -130,7 +131,7 @@ class Memory {
     final Map<String, dynamic> data = Map<String, dynamic>();
     data['Total'] = _total;
     data['Free'] = _free;
-    data['TimeRemainingForTimelapse'] = this.timeRemainingForTimelapse;
+    data['TimeRemainingForTimelapse'] = timeRemainingForTimelapse;
     return data;
   }
   String totalToGB() {

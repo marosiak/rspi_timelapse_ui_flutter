@@ -58,43 +58,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _getWidgets(bool isHorizontal) {
-    if (widget.statistics == null ||
-        widget.statistics!.cpu == null ||
-        widget.statistics!.ram == null ||
-        widget.statistics!.memory == null) {
-      return Container();
-    }
-    if (isHorizontal) {
-      return Row(
-        children: [
-          Expanded(
-              flex: 4, child: CpuStatsWidget(cpu: widget.statistics!.cpu!)),
-          Expanded(
-              flex: 7, child: RamStatsWidget(ram: widget.statistics!.ram!)),
-          Expanded(
-              flex: 3,
-              child: MemoryStatsWidget(memory: widget.statistics!.memory!)),
-        ],
-      );
-    } else {
-      return Column(
-        children: [
-          CpuStatsWidget(cpu: widget.statistics!.cpu!),
-          RamStatsWidget(ram: widget.statistics!.ram!),
-          MemoryStatsWidget(memory: widget.statistics!.memory!),
-        ],
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
 
     bool isTablet = (width > 980);
 
-    // String? selectedDirectory;
     return Scaffold(
       appBar: null,
       body: _lastUpdatedAt != null
@@ -105,7 +74,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     _getStatusBar(context),
                     const SizedBox(height: 8),
-                    _getWidgets(isTablet),
+                    StatsView(isTablet: isTablet, statistics: widget.statistics,),
                     Card(
                       child: Padding(
                         padding: const EdgeInsets.all(12),
@@ -120,13 +89,6 @@ class _HomePageState extends State<HomePage> {
                               ),
                               child: const Text("Remove all images"),
                             ),
-                            // ElevatedButton(
-                            //     onPressed: () async => (
-                            //       selectedDirectory = FilePicker.platform.getDirectoryPath() as String?
-                            //
-                            //     ),
-                            //   child: Text("Download files $selectedDirectory"),
-                            // ),
                           ],
                         ),
                       ),
@@ -136,6 +98,45 @@ class _HomePageState extends State<HomePage> {
               ))
           : Container(),
     );
+  }
+}
+
+class StatsView extends StatelessWidget {
+  const StatsView({
+    super.key, this.statistics, required this.isTablet,
+  });
+
+  final StatsResponse? statistics;
+  final bool isTablet;
+
+  @override
+  Widget build(BuildContext context) {
+    if (statistics == null ||
+        statistics!.cpu == null ||
+        statistics!.ram == null ||
+        statistics!.memory == null) {
+      return Container();
+    }
+    if (isTablet) {
+      return Row(
+        children: [
+          Expanded(
+              flex: 4, child: CpuStatsWidget(cpu: statistics!.cpu!)),
+          Expanded(
+              flex: 7, child: RamStatsWidget(ram: statistics!.ram!)),
+          Expanded(
+              flex: 3, child: MemoryStatsWidget(memory: statistics!.memory!)),
+        ],
+      );
+    } else {
+      return Column(
+        children: [
+          CpuStatsWidget(cpu: statistics!.cpu!),
+          RamStatsWidget(ram: statistics!.ram!),
+          MemoryStatsWidget(memory: statistics!.memory!),
+        ],
+      );
+    }
   }
 }
 

@@ -18,7 +18,7 @@ void main() {
 
 
 class _MyAppState extends State<MyApp> {
-  final websocket = Websocket('ws://localhost/ws');
+  final websocket = Websocket('ws://raspberrypi.local/ws');
   late WebSocketChannel channel = websocket.getWebSocketChannel();
   dynamic statisticsResponse;
   String? errorMsg;
