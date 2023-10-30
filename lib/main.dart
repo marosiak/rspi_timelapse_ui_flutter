@@ -10,6 +10,8 @@ import 'package:rspi_timelapse_web/theme.dart';
 import 'package:rspi_timelapse_web/websocket/ws.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import 'models/statistics.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -18,10 +20,11 @@ void main() {
 class _MyAppState extends State<MyApp> {
   final websocket = Websocket('ws://raspberrypi.local/ws');
   late WebSocketChannel channel = websocket.getWebSocketChannel();
-  dynamic statisticsData;
+  dynamic statisticsResponse;
   String? errorMsg;
   Timer ?_timer;
   bool isLogged = false;
+  DateTime ?lastUpdatedAt;
 
   void readSocketData(dynamic response) {
     Map valueMap = json.decode(response);
@@ -43,11 +46,10 @@ class _MyAppState extends State<MyApp> {
         });
       }
     }
-
-    if (valueMap['stats'] != null) {
+    if (valueMap['memory'] != null) {
       setState(() {
-        statisticsData = valueMap['stats'];
-        statisticsData['lastPhotoTakenAt'] = valueMap['lastPhotoTakenAt'];
+        statisticsResponse = StatsResponse.fromJson(valueMap);
+        lastUpdatedAt = DateTime.now();
       });
     }
     if (isLogged == true && _timer == null) {
@@ -71,8 +73,8 @@ Widget build(BuildContext context) {
   return MaterialApp(
     title: 'Timelapse',
     theme: defaultTheme(context),
-    home: isLogged
-        ? HomePage(title: 'Timelapse', channel: channel, statisticsData: statisticsData)
+    home: isLogged && lastUpdatedAt != null
+        ? HomePage(title: 'Timelapse', channel: channel, statistics: statisticsResponse, lastUpdatedAt: lastUpdatedAt)
         : LoginPage(title: "Timelapse Login", channel: channel, errorMsg: errorMsg),
   );
 }}
@@ -84,6 +86,3 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-String abc() {
-  return "";
-}
