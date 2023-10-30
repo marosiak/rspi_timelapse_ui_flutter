@@ -1,11 +1,8 @@
-import 'dart:async';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../components/dialogs.dart';
-import '../components/info_text.dart';
 import '../components/status.dart';
 import '../components/system_stats.dart';
 import '../models/statistics.dart';
@@ -33,15 +30,7 @@ class _HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.all(12),
                         child: Row(
                           children: [
-                            ElevatedButton(
-                              onPressed: () => showDialog<String>(
-                                context: context,
-                                builder: (BuildContext context) =>
-                                    RemoveFilesDialog(
-                                        onAccepted: widget.askToRemoveImages),
-                              ),
-                              child: const Text("Remove all images"),
-                            ),
+                            RemoveFilesButton(askToRemoveImages: widget.askToRemoveImages),
                           ],
                         ),
                       ),
@@ -50,6 +39,28 @@ class _HomePageState extends State<HomePage> {
                 ),
               ))
           : Container(),
+    );
+  }
+}
+
+class RemoveFilesButton extends StatelessWidget {
+  const RemoveFilesButton({
+    super.key,
+    required this.askToRemoveImages,
+  });
+
+  final OnAcceptedCallback askToRemoveImages;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () => showDialog<String>(
+        context: context,
+        builder: (BuildContext context) =>
+            RemoveFilesDialog(
+                onAccepted: askToRemoveImages),
+      ),
+      child: const Text("Remove all images"),
     );
   }
 }
