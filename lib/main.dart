@@ -24,6 +24,7 @@ class _MyAppState extends State<MyApp> {
   String? errorMsg;
   Timer ?_timer;
   bool isLogged = false;
+  DateTime ?lastUpdatedAt;
 
   void readSocketData(dynamic response) {
     Map valueMap = json.decode(response);
@@ -48,6 +49,7 @@ class _MyAppState extends State<MyApp> {
     if (valueMap['memory'] != null) {
       setState(() {
         statisticsResponse = StatsResponse.fromJson(valueMap);
+        lastUpdatedAt = DateTime.now();
       });
     }
     if (isLogged == true && _timer == null) {
@@ -72,7 +74,7 @@ Widget build(BuildContext context) {
     title: 'Timelapse',
     theme: defaultTheme(context),
     home: isLogged
-        ? HomePage(title: 'Timelapse', channel: channel, statistics: statisticsResponse)
+        ? HomePage(title: 'Timelapse', channel: channel, statistics: statisticsResponse, lastUpdatedAt: lastUpdatedAt)
         : LoginPage(title: "Timelapse Login", channel: channel, errorMsg: errorMsg),
   );
 }}

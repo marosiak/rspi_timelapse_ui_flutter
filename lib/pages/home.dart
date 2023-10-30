@@ -11,41 +11,20 @@ import '../components/system_stats.dart';
 import '../models/statistics.dart';
 
 class _HomePageState extends State<HomePage> {
-  DateTime? _lastUpdatedAt;
-
-  void askToRemoveImages() {
-    widget.channel.sink.add('{"action": "REMOVE_ALL_IMAGES"}');
-  }
-
-  @override
-  void didUpdateWidget(HomePage oldWidget) {
-    setState(() {
-      _lastUpdatedAt = DateTime.now();
-    });
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-
     bool isTablet = (width > 980);
 
     return Scaffold(
       appBar: null,
-      body: _lastUpdatedAt != null
+      body: widget.lastUpdatedAt != null
           ? Padding(
-              padding: const EdgeInsets.all(18.0),
+              padding: const EdgeInsets.only(left: 12, right: 12),
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    StatusBar(lastUpdatedAt: _lastUpdatedAt, statistics: widget.statistics),
+                    StatusBar(lastUpdatedAt: widget.lastUpdatedAt, statistics: widget.statistics),
                     const SizedBox(height: 8),
                     StatsView(isTablet: isTablet, statistics: widget.statistics),
                     Card(
@@ -58,7 +37,7 @@ class _HomePageState extends State<HomePage> {
                                 context: context,
                                 builder: (BuildContext context) =>
                                     RemoveFilesDialog(
-                                        onAccepted: askToRemoveImages),
+                                        onAccepted: widget.askToRemoveImages),
                               ),
                               child: const Text("Remove all images"),
                             ),
@@ -80,11 +59,16 @@ class HomePage extends StatefulWidget {
       {super.key,
       required this.title,
       required this.channel,
-      required this.statistics});
+      required this.statistics, this.lastUpdatedAt});
 
   final StatsResponse? statistics;
   final String title;
   final WebSocketChannel channel;
+  final DateTime? lastUpdatedAt;
+
+  void askToRemoveImages() {
+    channel.sink.add('{"action": "REMOVE_ALL_IMAGES"}');
+  }
 
   @override
   State<HomePage> createState() => _HomePageState();
