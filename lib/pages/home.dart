@@ -24,6 +24,7 @@ class _HomePageState extends State<HomePage> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                    const SizedBox(height: 16),
                     StatusBar(lastUpdatedAt: widget.lastUpdatedAt, statistics: widget.statistics),
                     const SizedBox(height: 8),
                     StatsView(isTablet: isTablet, statistics: widget.statistics),

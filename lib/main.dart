@@ -73,7 +73,7 @@ Widget build(BuildContext context) {
   return MaterialApp(
     title: 'Timelapse',
     theme: defaultTheme(context),
-    home: isLogged
+    home: isLogged && lastUpdatedAt != null
         ? HomePage(title: 'Timelapse', channel: channel, statistics: statisticsResponse, lastUpdatedAt: lastUpdatedAt)
         : LoginPage(title: "Timelapse Login", channel: channel, errorMsg: errorMsg),
   );

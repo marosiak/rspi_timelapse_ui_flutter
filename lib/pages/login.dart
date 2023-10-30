@@ -26,16 +26,17 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String? savedPassword = prefs.getString('password');
       if (savedPassword != null) {
         passwordController.text = savedPassword;
         login();
+        isLoading = false;
       }
       isLoading = false;
     });
+    super.initState();
 
   }
 
