@@ -78,11 +78,23 @@ class TextIconHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
       children: [
-        Icon(icon),
-        SizedBox(width: 8.0),
-        Text(title),
+        Row(
+          children: [
+            Icon(
+                icon,
+              size: 32,
+              color: Theme.of(context).primaryColor
+            ),
+            SizedBox(width: 12.0),
+            Text(
+                title,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+          ],
+        ),
+        SizedBox(height: 12),
       ],
     );
   }

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:rspi_timelapse_web/pages/home.dart';
+import 'package:rspi_timelapse_web/pages/home/home.dart';
 import 'package:rspi_timelapse_web/pages/login.dart';
 import 'package:rspi_timelapse_web/theme.dart';
 
@@ -16,13 +16,18 @@ void main() {
   runApp(MyApp());
 }
 
+const photosTopic = "PHOTOS";
+const statsTopic = "STTISTICS";
+
+typedef SubscribeFunction = void Function(String topic);
+
 
 class _MyAppState extends State<MyApp> {
-  final websocket = Websocket('ws://raspberrypi.local/ws');
+  // final websocket = Websocket('ws://raspberrypi.local/ws');
+  final websocket = Websocket('ws://localhost/ws');
   late WebSocketChannel channel = websocket.getWebSocketChannel();
   dynamic statisticsResponse;
   String? errorMsg;
-  Timer ?_timer;
   bool isLogged = false;
   DateTime ?lastUpdatedAt;
 
@@ -52,20 +57,21 @@ class _MyAppState extends State<MyApp> {
         lastUpdatedAt = DateTime.now();
       });
     }
-    if (isLogged == true && _timer == null) {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (isLogged == true) {
-        channel.sink.add('');
-      }
-    });
-  }
 }
+
+  void subscribe(String topic) {
+    channel.sink.add('{"action": "SUBSCRIBE", "value": "$topic"}');
+  }
+
+  void unsubscribe(String topic) {
+    channel.sink.add('{"action": "UNSUBSCRIBE", "value": "$topic"}');
+  }
 
 @override
 void initState() {
   super.initState();
   channel.stream.listen(readSocketData);
-  channel.sink.add(""); // Hey ws, I am ready to understand ur communication
+  channel.sink.add(""); // Hey ws, I am ready to understand ur communication //TODO is it needed?
 }
 
 @override
@@ -74,7 +80,14 @@ Widget build(BuildContext context) {
     title: 'Timelapse',
     theme: defaultTheme(context),
     home: isLogged && lastUpdatedAt != null
-        ? HomePage(title: 'Timelapse', channel: channel, statistics: statisticsResponse, lastUpdatedAt: lastUpdatedAt)
+        ? HomePage(
+        title: 'Timelapse',
+        channel: channel,
+        statistics: statisticsResponse,
+        lastUpdatedAt: lastUpdatedAt,
+        subscribeFunc: subscribe,
+      unsubscribeFunc: unsubscribe,
+    )
         : LoginPage(title: "Timelapse Login", channel: channel, errorMsg: errorMsg),
   );
 }}

@@ -30,3 +30,25 @@ class RemoveFilesDialog extends StatelessWidget {
     );
   }
 }
+
+class RemoveFilesButton extends StatelessWidget {
+  const RemoveFilesButton({
+    super.key,
+    required this.askToRemoveImages,
+  });
+
+  final OnAcceptedCallback askToRemoveImages;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () => showDialog<String>(
+        context: context,
+        builder: (BuildContext context) =>
+            RemoveFilesDialog(
+                onAccepted: askToRemoveImages),
+      ),
+      child: const Text("Remove all images"),
+    );
+  }
+}
